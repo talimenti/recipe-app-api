@@ -13,12 +13,16 @@ ARG DEV=false
 RUN python -m venv /py && \
     /py/bin/pip install --trusted-host files.pythonhosted.org \
     --trusted-host pypi.org --trusted-host pypi.python.org --upgrade pip && \
+    apk add --force --update --no-cache postgresql-client && \
+    apk add --force --update --no-cache --virtual .tmp-build-deps \
+        build-base postgresql-dev musl-dev && \
     /py/bin/pip install --trusted-host files.pythonhosted.org \ 
     --trusted-host pypi.org --trusted-host pypi.python.org -r /tmp/requirements.txt && \
     if [ $DEV = "true" ]; \
         then /py/bin/pip install --trusted-host files.pythonhosted.org --trusted-host pypi.org --trusted-host pypi.python.org -r /tmp/requirements.dev.txt ; \
     fi && \
     rm -rf /tmp && \
+    apk del .tmp-build-deps && \
     adduser \
         --disabled-password \
         --no-create-home \
